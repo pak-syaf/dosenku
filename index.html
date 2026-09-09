@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOSENKU - Portal Administrasi & Formulir Target IKU Terpadu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              500: '#15803d',
+              600: '#166534',
+              700: '#14532d',
+              800: '#0f3e22',
+              900: '#062814',
+            },
+            portal: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 9pt;
+        margin: 0;
+        padding: 0;
+      }
+      .no-print, header, footer, #viewDashboard, #ikuForm, #printPreviewModal, #resetModal, #toast, #formModal {
+        display: none !important;
+      }
+      #printableDocumentArea {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      table {
+        page-break-inside: auto;
+        border-collapse: collapse !important;
+        width: 100% !important;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      th, td {
+        border: 1px solid #334155 !important;
+        padding: 5px 8px !important;
+        font-size: 8.5pt !important;
+      }
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .print-only {
+      display: none;
+    }
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .transition-custom {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white">
+
+  <header class="no-print sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo & Brand Identity -->
+        <div class="flex items-center space-x-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-portal-600 via-indigo-600 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 shrink-0">
+            <i class="fa-solid fa-graduation-cap text-xl"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl sm:text-2xl font-black tracking-tight bg-gradient-to-r from-portal-700 via-indigo-600 to-emerald-700 bg-clip-text text-transparent">DOSENKU</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wide">Terpadu</span>
+            </div>
+            <p class="text-xs text-slate-500 hidden sm:block">Portal Pintar Administrasi Perkuliahan & Target IKU STKIP Al Hikmah</p>
+          </div>
+        </div>
+
+        <!-- Tab Navigation Switcher -->
+        <div class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+          <button id="navBtnDashboard" onclick="switchMainTab('dashboard')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 bg-white text-indigo-700 shadow-xs">
+            <i class="fa-solid fa-layer-group"></i>
+            <span class="hidden md:inline">Dasbor Formulir</span>
+            <span class="md:hidden">Dasbor</span>
+          </button>
+          
+          <button id="navBtnTargetIku" onclick="switchMainTab('targetIku')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-slate-600 hover:text-indigo-700 hover:bg-white/60">
+            <i class="fa-solid fa-bullseye text-emerald-600"></i>
+            <span class="hidden md:inline">Form Target IKU Resmi</span>
+            <span class="md:hidden">Target IKU</span>
+            <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-full">Baru</span>
+          </button>
+        </div>
+
+        <!-- Clock and Quick Date -->
+        <div class="hidden lg:flex flex-col text-right">
+          <span id="liveClock" class="text-xs font-bold text-slate-700">00:00:00 WIB</span>
+          <span id="liveDate" class="text-[11px] text-slate-500">Memuat tanggal...</span>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <div id="printableDocumentArea" class="print-only">
+    <!-- Diisi otomatis oleh JavaScript saat pratinjau atau cetak Target IKU -->
+  </div>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: DASBOR FORMULIR ADMINISTRASI DOSENKU                                -->
+    <!-- ========================================================================= -->
+    <div id="viewDashboard" class="space-y-8">
+      
+      <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-portal-900 via-indigo-900 to-emerald-950 text-white p-6 sm:p-10 shadow-xl shadow-indigo-950/10">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -top-10 w-72 h-72 bg-portal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2.5 max-w-2xl">
+            <div class="inline-flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-emerald-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm border border-white/15">
+              <i class="fa-solid fa-sparkles text-amber-300"></i>
+              <span>Dashboard Terintegrasi STKIP Al Hikmah</span>
+            </div>
+            <h1 id="greetingHeading" class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
+              Selamat Datang, Bapak/Ibu Dosen
+            </h1>
+            <p class="text-slate-200 text-xs sm:text-sm leading-relaxed">
+              Kelola berita acara, bimbingan, perkuliahan, dan susun lembar penetapan <strong>Target IKU Dosen & Tendik</strong> terstandar dengan pengesahan resmi secara praktis.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-2.5">
+              <button onclick="switchMainTab('targetIku')" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 text-xs font-bold rounded-xl shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Buka Formulir Target IKU Resmi</span>
+              </button>
+              <button onclick="document.getElementById('formSearch').focus()" class="px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-xs font-semibold rounded-xl border border-white/20 transition flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Cari Form Administrasi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Search -->
+          <div class="w-full md:w-80">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+              <input 
+                type="text" 
+                id="formSearch" 
+                oninput="filterCards()" 
+                placeholder="Cari formulir..." 
+                class="w-full pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:bg-white/20 transition-all"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+          <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-file-signature text-lg"></i>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total Modul</p>
+            <p class="text-base sm:text-lg font-bold text-slate-800">6 Administrasi</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-users-viewfinder text-lg"></i>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total Pengisian</p>
+            <p id="totalFillsCounter" class="text-base sm:text-lg font-bold text-emerald-600">0 Respon</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+          <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Terakhir Diakses</p>
+            <p id="lastOpenedText" class="text-xs font-bold text-slate-800 truncate max-w-[130px]">Belum ada</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3.5">
+          <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-certificate text-lg"></i>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Pengesahan IKU</p>
+            <p class="text-xs font-bold text-slate-800 truncate">Dr. Ahmad Syafi'i</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Daftar Formulir Administrasi Dosen</h2>
+            <p class="text-xs text-slate-500">Pilih formulir untuk pengisian langsung, modal semat, atau formulir interaktif institusi.</p>
+          </div>
+        </div>
+
+        <div id="formsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- SPECIAL CARD: Target IKU Dosen dan Tendik (Terintegrasi Penuh) -->
+          <div class="form-card bg-gradient-to-br from-emerald-50/70 via-white to-white rounded-2xl border-2 border-emerald-400/80 p-6 shadow-md hover:shadow-xl transition-custom flex flex-col justify-between relative overflow-hidden"
+               data-title="Target IKU Dosen dan Tendik (Sistem Terpadu)" 
+               data-category="target sasaran iku indikator kinerja utama tendik kpi rencana tridharma pmb pengajaran penelitian pkm">
+            <div class="absolute top-0 right-0 bg-emerald-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider shadow-xs">
+              Terintegrasi Penuh
+            </div>
+            
+            <div class="space-y-4">
+              <div class="flex items-start justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5 text-emerald-600 animate-ping"></i> Resmi STKIP
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span>Target IKU Dosen dan Tendik</span>
+                </h3>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Penyusunan target PMB, Pengajaran, Penelitian, PkM, Tugas Tambahan, pas foto, serta pengesahan otomatis <strong>Dr. Ahmad Syafi'i, M.Pd.</strong> siap cetak PDF.
+                </p>
+              </div>
+
+              <!-- Counter Box -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-emerald-200 shadow-2xs">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] text-slate-500 block leading-tight">Telah Diisi:</span>
+                    <span id="counter-target_iku" class="text-xs font-bold text-slate-800">35 Dosen/Tendik</span>
+                  </div>
+                </div>
+                <button onclick="incrementCounter('target_iku', 'Target IKU Dosen & Tendik')" 
+                        title="Tandai Anda telah menyelesaikan formulir ini" 
+                        class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 shadow-2xs">
+                  <i class="fa-solid fa-plus text-[9px]"></i>
+                  <span>Tandai Selesai</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-4 border-t border-emerald-100 flex items-center gap-2">
+              <button onclick="switchMainTab('targetIku')" 
+                      class="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all">
+                <i class="fa-solid fa-pen-nib"></i>
+                <span>Buka Form Target IKU</span>
+              </button>
+              <button onclick="openFormModal('Target IKU Dosen dan Tendik (Google Form)', 'https://docs.google.com/forms/d/e/1FAIpQLScTfP4i8vjOT-Th4-8smjjVGY4NuOjkCXC4kwzFSW3jEzQHww/viewform?embedded=true', 'https://docs.google.com/forms/d/e/1FAIpQLScTfP4i8vjOT-Th4-8smjjVGY4NuOjkCXC4kwzFSW3jEzQHww/viewform', 'target_iku')" 
+                 title="Buka Form Versi Google Form"
+                 class="p-2.5 text-slate-600 hover:text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 rounded-xl text-xs transition-colors">
+                <i class="fa-brands fa-google"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form 1: Berita Acara Perkuliahan -->
+          <div class="form-card bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg hover:border-indigo-200 transition-custom flex flex-col justify-between"
+               data-title="Berita Acara Perkuliahan" 
+               data-category="perkuliahan BAP pengajaran kehadiran presensi">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5 text-indigo-500"></i> Rutin Setiap Sesi
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-base font-bold text-slate-900">
+                  Berita Acara Perkuliahan
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Pelaporan materi perkuliahan, kehadiran mahasiswa, tanggal/waktu pertemuan, dan dokumentasi sesi mengajar harian.
+                </p>
+              </div>
+
+              <!-- Counter Box -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] text-slate-500 block leading-tight">Telah Diisi:</span>
+                    <span id="counter-bap" class="text-xs font-bold text-slate-800">48 Dosen</span>
+                  </div>
+                </div>
+                <button onclick="incrementCounter('bap', 'Berita Acara Perkuliahan')" 
+                        class="px-2.5 py-1 bg-white hover:bg-indigo-50 text-indigo-600 border border-slate-200 hover:border-indigo-300 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 shadow-2xs">
+                  <i class="fa-solid fa-plus text-[9px]"></i>
+                  <span>Tandai Selesai</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-4 border-t border-slate-100 flex items-center gap-2">
+              <button onclick="openFormModal('Berita Acara Perkuliahan', 'https://docs.google.com/forms/d/e/1FAIpQLSdpI0etJF_wNWYmZKC63Mfy3aGe0y9a2LUW2Dbku_NFo0frPw/viewform?embedded=true', 'https://docs.google.com/forms/d/e/1FAIpQLSdpI0etJF_wNWYmZKC63Mfy3aGe0y9a2LUW2Dbku_NFo0frPw/viewform?usp=dialog', 'bap')" 
+                      class="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow-xs hover:shadow transition-all">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Isi Form</span>
+              </button>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSdpI0etJF_wNWYmZKC63Mfy3aGe0y9a2LUW2Dbku_NFo0frPw/viewform?usp=dialog" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 onclick="logAccess('Berita Acara Perkuliahan')"
+                 title="Buka di Tab Baru"
+                 class="p-2.5 text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button onclick="copyToClipboard('https://docs.google.com/forms/d/e/1FAIpQLSdpI0etJF_wNWYmZKC63Mfy3aGe0y9a2LUW2Dbku_NFo0frPw/viewform?usp=dialog', 'Tautan Berita Acara Perkuliahan')" 
+                      title="Salin Tautan"
+                      class="p-2.5 text-slate-600 hover:text-indigo-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form 2: Kanal YouTube Dosen -->
+          <div class="form-card bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg hover:border-red-200 transition-custom flex flex-col justify-between"
+               data-title="Kanal YouTube Dosen" 
+               data-category="youtube video media ajar pembelajaran publikasi">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-brands fa-youtube"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100">
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5 text-red-500"></i> Media Pembelajaran
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-base font-bold text-slate-900">
+                  Kanal Youtube Dosen
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Pendataan kanal YouTube dosen, tautan video kuliah asinkron, mikro-materi, dan portofolio pembelajaran digital.
+                </p>
+              </div>
+
+              <!-- Counter Box -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg bg-red-100 text-red-700 flex items-center justify-center text-xs font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] text-slate-500 block leading-tight">Telah Diisi:</span>
+                    <span id="counter-youtube" class="text-xs font-bold text-slate-800">26 Dosen</span>
+                  </div>
+                </div>
+                <button onclick="incrementCounter('youtube', 'Kanal Youtube Dosen')" 
+                        class="px-2.5 py-1 bg-white hover:bg-red-50 text-red-600 border border-slate-200 hover:border-red-300 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 shadow-2xs">
+                  <i class="fa-solid fa-plus text-[9px]"></i>
+                  <span>Tandai Selesai</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-4 border-t border-slate-100 flex items-center gap-2">
+              <button onclick="openFormModal('Kanal Youtube Dosen', 'https://docs.google.com/forms/d/e/1FAIpQLSeSMyvovUQje6Tpl-oNW7__6Lk-F3ldlhm-wpSccphPqE06-g/viewform?embedded=true', 'https://docs.google.com/forms/d/e/1FAIpQLSeSMyvovUQje6Tpl-oNW7__6Lk-F3ldlhm-wpSccphPqE06-g/viewform?usp=dialog', 'youtube')" 
+                      class="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl shadow-xs hover:shadow transition-all">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Isi Form</span>
+              </button>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSeSMyvovUQje6Tpl-oNW7__6Lk-F3ldlhm-wpSccphPqE06-g/viewform?usp=dialog" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 onclick="logAccess('Kanal Youtube Dosen')"
+                 title="Buka di Tab Baru"
+                 class="p-2.5 text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button onclick="copyToClipboard('https://docs.google.com/forms/d/e/1FAIpQLSeSMyvovUQje6Tpl-oNW7__6Lk-F3ldlhm-wpSccphPqE06-g/viewform?usp=dialog', 'Tautan Kanal Youtube Dosen')" 
+                      title="Salin Tautan"
+                      class="p-2.5 text-slate-600 hover:text-red-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form 3: Tugas Akhir Mahasiswa -->
+          <div class="form-card bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg hover:border-emerald-200 transition-custom flex flex-col justify-between"
+               data-title="Tugas Akhir Mahasiswa" 
+               data-category="skripsi tugas akhir tesis pembimbingan uji proposal sidang">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5 text-emerald-500"></i> Skripsi & Tugas Akhir
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-base font-bold text-slate-900">
+                  Tugas Akhir Mahasiswa
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Pencatatan perkembangan bimbingan skripsi/TA, pengajuan seminar proposal, persetujuan sidang, dan evaluasi tugas akhir.
+                </p>
+              </div>
+
+              <!-- Counter Box -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] text-slate-500 block leading-tight">Telah Diisi:</span>
+                    <span id="counter-ta" class="text-xs font-bold text-slate-800">37 Dosen</span>
+                  </div>
+                </div>
+                <button onclick="incrementCounter('ta', 'Tugas Akhir Mahasiswa')" 
+                        class="px-2.5 py-1 bg-white hover:bg-emerald-50 text-emerald-600 border border-slate-200 hover:border-emerald-300 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 shadow-2xs">
+                  <i class="fa-solid fa-plus text-[9px]"></i>
+                  <span>Tandai Selesai</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-4 border-t border-slate-100 flex items-center gap-2">
+              <button onclick="openFormModal('Tugas Akhir Mahasiswa', 'https://docs.google.com/forms/d/e/1FAIpQLSc7Dtg863u1wOdZ9XqVmT70jxUcSS9jIoBuynfD2_3IHlQ7xw/viewform?embedded=true', 'https://docs.google.com/forms/d/e/1FAIpQLSc7Dtg863u1wOdZ9XqVmT70jxUcSS9jIoBuynfD2_3IHlQ7xw/viewform?usp=dialog', 'ta')" 
+                      class="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-xs hover:shadow transition-all">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Isi Form</span>
+              </button>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSc7Dtg863u1wOdZ9XqVmT70jxUcSS9jIoBuynfD2_3IHlQ7xw/viewform?usp=dialog" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 onclick="logAccess('Tugas Akhir Mahasiswa')"
+                 title="Buka di Tab Baru"
+                 class="p-2.5 text-slate-600 hover:text-emerald-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button onclick="copyToClipboard('https://docs.google.com/forms/d/e/1FAIpQLSc7Dtg863u1wOdZ9XqVmT70jxUcSS9jIoBuynfD2_3IHlQ7xw/viewform?usp=dialog', 'Tautan Tugas Akhir Mahasiswa')" 
+                      title="Salin Tautan"
+                      class="p-2.5 text-slate-600 hover:text-emerald-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form 4: Pembimbingan Akademik -->
+          <div class="form-card bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg hover:border-amber-200 transition-custom flex flex-col justify-between"
+               data-title="Pembimbingan Akademik" 
+               data-category="dosen wali krs perwalian konseling bimbingan akademik ipk">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-solid fa-user-group"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100">
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5 text-amber-500"></i> Perwalian & Konsultasi
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-base font-bold text-slate-900">
+                  Pembimbingan Akademik
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Log pembimbingan dosen wali (DPA), persetujuan rencana studi (KRS), monitoring IPK, serta catatan bimbingan berkala.
+                </p>
+              </div>
+
+              <!-- Counter Box -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] text-slate-500 block leading-tight">Telah Diisi:</span>
+                    <span id="counter-pa" class="text-xs font-bold text-slate-800">52 Dosen</span>
+                  </div>
+                </div>
+                <button onclick="incrementCounter('pa', 'Pembimbingan Akademik')" 
+                        class="px-2.5 py-1 bg-white hover:bg-amber-50 text-amber-600 border border-slate-200 hover:border-amber-300 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 shadow-2xs">
+                  <i class="fa-solid fa-plus text-[9px]"></i>
+                  <span>Tandai Selesai</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-4 border-t border-slate-100 flex items-center gap-2">
+              <button onclick="openFormModal('Pembimbingan Akademik', 'https://docs.google.com/forms/d/e/1FAIpQLScDUaCUtGkFCTO_jjmFi1rIcGxGC73vt_AeOI23kgy5QUWTXQ/viewform?embedded=true', 'https://docs.google.com/forms/d/e/1FAIpQLScDUaCUtGkFCTO_jjmFi1rIcGxGC73vt_AeOI23kgy5QUWTXQ/viewform?usp=dialog', 'pa')" 
+                      class="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-xs hover:shadow transition-all">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Isi Form</span>
+              </button>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLScDUaCUtGkFCTO_jjmFi1rIcGxGC73vt_AeOI23kgy5QUWTXQ/viewform?usp=dialog" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 onclick="logAccess('Pembimbingan Akademik')"
+                 title="Buka di Tab Baru"
+                 class="p-2.5 text-slate-600 hover:text-amber-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button onclick="copyToClipboard('https://docs.google.com/forms/d/e/1FAIpQLScDUaCUtGkFCTO_jjmFi1rIcGxGC73vt_AeOI23kgy5QUWTXQ/viewform?usp=dialog', 'Tautan Pembimbingan Akademik')" 
+                      title="Salin Tautan"
+                      class="p-2.5 text-slate-600 hover:text-amber-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form 5: Capaian IKU Dosen dan Tendik -->
+          <div class="form-card bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg hover:border-cyan-200 transition-custom flex flex-col justify-between"
+               data-title="Capaian IKU Dosen dan Tendik" 
+               data-category="iku capaian indikator kinerja utama tendik kpi evaluasi mutu tridharma">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl shadow-inner">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-50 text-cyan-700 border border-cyan-100">
+                  <i class="fa-solid fa-circle text-[6px] mr-1.5 text-cyan-500"></i> Kinerja & Mutu
+                </span>
+              </div>
+              
+              <div>
+                <h3 class="text-base font-bold text-slate-900">
+                  Capaian IKU Dosen dan Tendik
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Pengukuran dan pelaporan capaian Indikator Kinerja Utama (IKU), sasaran kinerja, serta evaluasi mutu tridharma.
+                </p>
+              </div>
+
+              <!-- Counter Box -->
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center space-x-2">
+                  <div class="w-7 h-7 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center text-xs font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div>
+                    <span class="text-[11px] text-slate-500 block leading-tight">Telah Diisi:</span>
+                    <span id="counter-iku" class="text-xs font-bold text-slate-800">41 Dosen/Tendik</span>
+                  </div>
+                </div>
+                <button onclick="incrementCounter('iku', 'Capaian IKU Dosen & Tendik')" 
+                        class="px-2.5 py-1 bg-white hover:bg-cyan-50 text-cyan-600 border border-slate-200 hover:border-cyan-300 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 shadow-2xs">
+                  <i class="fa-solid fa-plus text-[9px]"></i>
+                  <span>Tandai Selesai</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-4 border-t border-slate-100 flex items-center gap-2">
+              <button onclick="openFormModal('Capaian IKU Dosen dan Tendik', 'https://docs.google.com/forms/d/e/1FAIpQLSevZNCQz05tYScgJngWcehTADw7iBdMDKxDFpKPbkpjbx51DQ/viewform?embedded=true', 'https://docs.google.com/forms/d/e/1FAIpQLSevZNCQz05tYScgJngWcehTADw7iBdMDKxDFpKPbkpjbx51DQ/viewform?usp=dialog', 'iku')" 
+                      class="flex-1 inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold rounded-xl shadow-xs hover:shadow transition-all">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Isi Form</span>
+              </button>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSevZNCQz05tYScgJngWcehTADw7iBdMDKxDFpKPbkpjbx51DQ/viewform?usp=dialog" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 onclick="logAccess('Capaian IKU Dosen dan Tendik')"
+                 title="Buka di Tab Baru"
+                 class="p-2.5 text-slate-600 hover:text-cyan-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button onclick="copyToClipboard('https://docs.google.com/forms/d/e/1FAIpQLSevZNCQz05tYScgJngWcehTADw7iBdMDKxDFpKPbkpjbx51DQ/viewform?usp=dialog', 'Tautan Capaian IKU Dosen dan Tendik')" 
+                      title="Salin Tautan"
+                      class="p-2.5 text-slate-600 hover:text-cyan-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs transition-colors">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- No Results State -->
+        <div id="noResults" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 mt-4">
+          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+          </div>
+          <p class="text-sm font-semibold text-slate-700">Formulir tidak ditemukan</p>
+          <p class="text-xs text-slate-400 mt-1">Gunakan kata kunci seperti "IKU", "BAP", "perwalian", atau "skripsi".</p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: FORMULIR TARGET IKU RESMI TERINTEGRASI                              -->
+    <!-- ========================================================================= -->
+    <div id="viewTargetIku" class="hidden space-y-6">
+
+      <!-- Action & Navigation Bar for Target IKU -->
+      <div class="no-print bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="switchMainTab('dashboard')" class="px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-indigo-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Dasbor</span>
+          </button>
+          <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-800">Formulir Target IKU Dosen & Tendik</h2>
+            <p class="text-[11px] text-slate-500">STKIP Al Hikmah Surabaya &bull; Format Standar Penjaminan Mutu</p>
+          </div>
+        </div>
+
+        <div class="flex items-center flex-wrap gap-2">
+          <button type="button" onclick="fillDemoData()" class="px-3 py-2 text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded-xl transition flex items-center gap-1.5" title="Isi form otomatis dengan contoh data">
+            <i class="fa-solid fa-bolt text-amber-600"></i>
+            <span>Isi Contoh</span>
+          </button>
+
+          <button type="button" onclick="saveDraft()" class="px-3 py-2 text-xs font-semibold bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl shadow-xs transition flex items-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Simpan Draft</span>
+          </button>
+
+          <button type="button" onclick="openPrintPreview()" class="px-3.5 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl shadow-xs transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i>
+            <span>Pratinjau & Cetak</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Target IKU Form -->
+      <form id="ikuForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
+
+        <!-- Section 1: Profil Dosen & Tendik -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-brand-700 to-brand-600 px-6 py-4 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">1</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Identitas Resmi Dosen / Tendik</h3>
+                <p class="text-xs text-brand-100">Biodata dan penugasan resmi di STKIP Al Hikmah Surabaya</p>
+              </div>
+            </div>
+            <span class="text-xs bg-amber-400/20 text-amber-200 border border-amber-400/30 px-2.5 py-1 rounded-full font-medium">Wajib Diisi</span>
+          </div>
+
+          <div class="p-6 sm:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+              
+              <!-- Kolom Pas Foto -->
+              <div class="md:col-span-4 lg:col-span-3 flex flex-col items-center text-center p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                <div class="relative group mb-3">
+                  <div class="w-36 h-48 sm:w-40 sm:h-52 rounded-xl overflow-hidden bg-slate-200 border-2 border-dashed border-slate-300 shadow-inner flex items-center justify-center relative">
+                    <img id="photoPreview" src="https://placehold.co/400x520/e2e8f0/475569?text=Pas+Foto+Resmi" alt="Foto Resmi" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium cursor-pointer" onclick="document.getElementById('photoInput').click()">
+                      <span>Pilih Foto</span>
+                    </div>
+                  </div>
+                  <label for="photoInput" class="absolute -bottom-2 -right-2 bg-brand-600 hover:bg-brand-500 text-white p-2 rounded-full shadow-md cursor-pointer transition no-print" title="Unggah Foto">
+                    <i class="fa-solid fa-camera text-xs"></i>
+                  </label>
+                </div>
+
+                <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                
+                <div class="space-y-1">
+                  <span class="text-xs font-bold text-slate-700 block uppercase tracking-wider">Pas Foto Resmi</span>
+                  <p class="text-[11px] text-slate-500 leading-tight">Busana formal syar'i / jas institusi</p>
+                </div>
+
+                <div class="mt-3 flex gap-2 no-print">
+                  <button type="button" onclick="document.getElementById('photoInput').click()" class="text-xs px-2.5 py-1.5 bg-white hover:bg-slate-100 text-brand-700 border border-slate-300 rounded-lg font-medium transition">
+                    Unggah
+                  </button>
+                  <button type="button" onclick="resetPhoto()" class="text-xs px-2.5 py-1.5 bg-white hover:bg-red-50 text-red-600 border border-slate-300 rounded-lg font-medium transition">
+                    Reset
+                  </button>
+                </div>
+              </div>
+
+              <!-- Kolom Data Identitas -->
+              <div class="md:col-span-8 lg:col-span-9 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Nama Dosen / Tendik dengan Gelar Lengkap <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="namaGelar" name="namaGelar" required
+                      placeholder="Contoh: Dr. H. Ahmad Faiz, M.Pd. / Fulanah, S.Kom." 
+                      class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      NIDN / NUPTK / NIP
+                    </label>
+                    <input type="text" id="nidn" name="nidn" placeholder="Contoh: 0715088901 / NIP Tendik"
+                      class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Program Studi / Kategori <span class="text-red-500">*</span>
+                    </label>
+                    <select id="programStudi" name="programStudi" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
+                      <option value="">-- Pilih Program Studi / Tendik --</option>
+                      <option value="Pendidikan Matematika">Pendidikan Matematika</option>
+                      <option value="Pendidikan Bahasa Inggris">Pendidikan Bahasa Inggris</option>
+                      <option value="Pendidikan Fisika">Pendidikan Fisika</option>
+                      <option value="Pendidikan Bahasa Indonesia">Pendidikan Bahasa Indonesia</option>
+                      <option value="PGSD">PGSD</option>
+                      <option value="Tendik">Tendik</option>
+                    </select>
+                  </div>
+
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                      Semester & Tahun Akademik <span class="text-red-500">*</span>
+                    </label>
+                    <select id="semester" name="semester" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
+                      <option value="Semester Ganjil 2026/2027">Semester Ganjil 2026/2027</option>
+                      <option value="Semester Genap 2026/2027">Semester Genap 2026/2027</option>
+                      <option value="Semester Ganjil 2025/2026">Semester Ganjil 2025/2026</option>
+                      <option value="Semester Genap 2025/2026">Semester Genap 2025/2026</option>
+                    </select>
+                  </div>
+
+                  <!-- Tugas Tambahan Dinamis -->
+                  <div class="sm:col-span-2 pt-1">
+                    <div class="flex items-center justify-between mb-2">
+                      <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                          Tugas Tambahan / Penugasan Khusus Institusi
+                        </label>
+                        <p class="text-[11px] text-slate-500">Tambahkan baris penugasan (Kaprodi, panitia PMB, audit mutu, asrama, dll).</p>
+                      </div>
+                      <button type="button" onclick="addTugasTambahanRow()" class="no-print text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>+ Tambah Tugas</span>
+                      </button>
+                    </div>
+
+                    <div id="tugasTambahanContainer" class="space-y-2">
+                      <!-- Baris dirender JS -->
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Target PMB -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-amber-700 to-amber-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">2</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Target IKU: Kontribusi Penerimaan Mahasiswa Baru (PMB)</h3>
+                <p class="text-xs text-amber-100">Jalur Reguler, Profesional, RPL, Kerjasama, KIP-K, dan Beasiswa Pemkot</p>
+              </div>
+            </div>
+            <button type="button" onclick="addTargetRow('pmb')" class="no-print text-xs font-semibold bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>+ Tambah Target PMB</span>
+            </button>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-3">
+            <div id="pmbContainer" class="space-y-2.5">
+              <!-- Baris PMB dinamis -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Target Pengajaran -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-700 to-blue-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">3</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Target IKU: Bidang Pengajaran</h3>
+                <p class="text-xs text-blue-100">Pengampuan MK, bimbingan tugas akhir/skripsi, pengujian, dan RPS OBE</p>
+              </div>
+            </div>
+            <button type="button" onclick="addTargetRow('pengajaran')" class="no-print text-xs font-semibold bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>+ Tambah Target Pengajaran</span>
+            </button>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-3">
+            <div id="pengajaranContainer" class="space-y-2.5">
+              <!-- Baris Pengajaran dinamis -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 4: Target Penelitian -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-indigo-700 to-indigo-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">4</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Target IKU: Bidang Penelitian & Publikasi</h3>
+                <p class="text-xs text-indigo-100">Hibah internal/kementerian, publikasi SINTA/Scopus, buku ber-ISBN, dan HKI</p>
+              </div>
+            </div>
+            <button type="button" onclick="addTargetRow('penelitian')" class="no-print text-xs font-semibold bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>+ Tambah Target Penelitian</span>
+            </button>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-3">
+            <div id="penelitianContainer" class="space-y-2.5">
+              <!-- Baris Penelitian dinamis -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 5: Target PkM -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-emerald-700 to-emerald-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">5</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Target IKU: Pengabdian kepada Masyarakat (PkM)</h3>
+                <p class="text-xs text-emerald-100">Pelatihan, pendampingan sekolah mitra, pesantren, dan masyarakat luas</p>
+              </div>
+            </div>
+            <button type="button" onclick="addTargetRow('pkm')" class="no-print text-xs font-semibold bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>+ Tambah Target PkM</span>
+            </button>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-3">
+            <div id="pkmContainer" class="space-y-2.5">
+              <!-- Baris PkM dinamis -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 6: Target Tugas Tambahan -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-purple-700 to-purple-600 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">6</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Target IKU: Tugas Tambahan / Penunjang</h3>
+                <p class="text-xs text-purple-100">Target kepanitiaan institusi, akreditasi prodi/LAMDIK, atau manajerial unit</p>
+              </div>
+            </div>
+            <button type="button" onclick="addTargetRow('tugasTambahanTarget')" class="no-print text-xs font-semibold bg-white/20 hover:bg-white/30 text-white border border-white/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>+ Tambah Target Penunjang</span>
+            </button>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-3">
+            <div id="tugasTambahanTargetContainer" class="space-y-2.5">
+              <!-- Baris Target Penunjang dinamis -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 7: Pernyataan & Pengesahan Otomatis Dr. Ahmad Syafi'i, M.Pd. -->
+        <section class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white text-sm font-bold">7</span>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold">Pernyataan Komitmen & Pengesahan Resmi</h3>
+                <p class="text-xs text-slate-300">Penetapan target kinerja yang sah dan mengikat</p>
+              </div>
+            </div>
+            <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded">Sah & Mengikat</span>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700">
+              <input type="checkbox" id="komitmenCheck" required class="mt-0.5 rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+              <label for="komitmenCheck" class="leading-relaxed">
+                Dengan ini saya menyatakan bahwa target Indikator Kinerja Utama (IKU) di atas telah saya susun dengan penuh kesungguhan dan berlandaskan visi misi <strong>STKIP Al Hikmah Surabaya</strong>. Saya berkomitmen untuk merealisasikan seluruh target ini dengan sebaik-baiknya demi kemajuan dakwah pendidikan dan institusi.
+              </label>
+            </div>
+
+            <!-- Tanda Tangan 3 Kolom Termasuk Pengesahan Otomatis -->
+            <div class="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center text-xs">
+              
+              <!-- Kolom Dosen -->
+              <div class="flex flex-col justify-between h-40 p-4 bg-slate-50/70 rounded-xl border border-dashed border-slate-300">
+                <span class="text-slate-600 leading-tight">Surabaya, <span id="currentDateDisplay">Memuat...</span><br><span class="font-semibold text-slate-700">Dosen / Tendik Bersangkutan,</span></span>
+                <div class="mt-auto pt-6">
+                  <span id="signatureName" class="font-bold text-slate-800 underline block text-[13px]">Nama Lengkap Dosen</span>
+                  <span id="signatureNidn" class="text-[11px] text-slate-500 block mt-0.5">NIDN / NUPTK: -</span>
+                </div>
+              </div>
+
+              <!-- Kolom Kaprodi / Atasan -->
+              <div class="flex flex-col justify-between h-40 p-4 bg-slate-50/70 rounded-xl border border-dashed border-slate-300">
+                <span class="text-slate-600 leading-tight">Mengetahui,<br><span class="font-semibold text-slate-700">Ketua Program Studi / Atasan Langsung,</span></span>
+                <div class="mt-auto pt-6">
+                  <span class="font-bold text-slate-800 underline block text-[13px] tracking-wider">...................................................</span>
+                  <span class="text-[11px] text-slate-500 block mt-0.5">NIDN / NUPTK: .................................</span>
+                </div>
+              </div>
+
+              <!-- Kolom Pejabat Otomatis Terisi: Dr. Ahmad Syafi'i, M.Pd. -->
+              <div class="flex flex-col justify-between h-40 p-4 bg-emerald-50/60 rounded-xl border border-emerald-300 shadow-2xs relative">
+                <div class="absolute -top-2.5 right-3 bg-emerald-700 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-2xs">
+                  Otomatis Terisi
+                </div>
+                <span class="text-slate-700 leading-tight">Mengesahkan / Menyetujui,<br><span class="font-bold text-emerald-900">Wakil Ketua I Bidang Akademik</span></span>
+                <div class="mt-auto pt-6">
+                  <span class="font-bold text-slate-900 underline block text-[13px]">Dr. Ahmad Syafi'i, M.Pd.</span>
+                  <span class="text-[11px] font-semibold text-emerald-800 block mt-0.5">NIDN: 0712048204</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Action Bar Bawah -->
+            <div class="no-print pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200">
+              <button type="button" onclick="showResetModal()" class="w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition border border-slate-200">
+                Reset Isian Form
+              </button>
+
+              <div class="w-full sm:w-auto flex items-center gap-3">
+                <button type="button" onclick="saveDraft()" class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-200 hover:bg-slate-300 rounded-xl transition">
+                  Simpan Draft
+                </button>
+                <button type="button" onclick="openPrintPreview()" class="w-full sm:w-auto px-6 py-2.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-brand-700 to-brand-600 hover:from-brand-800 hover:to-brand-700 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-print"></i>
+                  <span>Pratinjau & Cetak PDF</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </form>
+
+    </div>
+
+  </main>
+
+  <footer class="no-print bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-indigo-700">DOSENKU</span>
+        <span>&bull;</span>
+        <span>Dashboard Terpadu Administrasi & IKU Dosen</span>
+        <span>&bull;</span>
+        <span class="text-slate-600 font-medium">STKIP Al Hikmah Surabaya</span>
+      </div>
+      <p class="text-[11px] text-slate-400">Mencetak Pendidik Religius dan Profesional</p>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1: FORM VIEWER (GOOGLE FORM EMBED)                                   -->
+  <!-- ========================================================================= -->
+  <div id="formModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200">
+      
+      <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+          <div>
+            <h4 id="modalTitle" class="text-sm font-bold text-slate-800">Nama Form</h4>
+            <p class="text-[11px] text-slate-500">Google Form Tersemat</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button id="modalDoneBtn" onclick="markCurrentModalDone()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg flex items-center space-x-1.5 transition-colors shadow-2xs">
+            <i class="fa-solid fa-circle-check text-xs"></i>
+            <span class="hidden sm:inline">Saya Sudah Mengisi</span>
+          </button>
+          <a id="modalExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg flex items-center space-x-1.5 transition-colors">
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            <span class="hidden sm:inline">Buka Tab Penuh</span>
+          </a>
+          <button onclick="closeFormModal()" class="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-grow relative bg-slate-100">
+        <div id="iframeLoader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
+          <div class="w-9 h-9 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <p class="text-xs font-medium text-slate-600">Memuat formulir...</p>
+        </div>
+        <iframe id="formIframe" src="" class="w-full h-full border-0"></iframe>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: PRATINJAU DOKUMEN CETAK TARGET IKU RESMI                          -->
+  <!-- ========================================================================= -->
+  <div id="printPreviewModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden">
+      
+      <div class="px-6 py-4 bg-slate-800 text-white flex items-center justify-between border-b border-slate-700 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white">Pratinjau Lembar Penetapan Target IKU</h3>
+            <p class="text-xs text-slate-300">Format cetak siap kirim & simpan PDF STKIP Al Hikmah Surabaya</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="printInNewWindow()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-lg transition border border-slate-600">
+            <i class="fa-solid fa-window-restore text-xs"></i>
+            <span>Buka di Tab Baru</span>
+          </button>
+          <button type="button" onclick="closePrintPreview()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700 transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex justify-center">
+        <div id="previewSheetContent" class="bg-white p-6 sm:p-10 rounded-xl shadow-md max-w-4xl w-full border border-slate-200 text-slate-900 text-xs">
+          <!-- Diisi via JavaScript -->
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="text-xs text-slate-500">
+          Tip: Pada dialog cetak printer, pilih <strong>"Save as PDF" / "Simpan sebagai PDF"</strong>.
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closePrintPreview()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
+            Kembali Edit
+          </button>
+          <button type="button" onclick="printDirectly()" class="px-5 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 rounded-xl shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i>
+            <span>Cetak / Unduh PDF</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3: KONFIRMASI RESET FORMULIR                                         -->
+  <!-- ========================================================================= -->
+  <div id="resetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+        <i class="fa-solid fa-trash-can text-lg"></i>
+      </div>
+      <div class="text-center">
+        <h3 class="text-base font-bold text-slate-800">Kosongkan Formulir?</h3>
+        <p class="text-xs text-slate-500 mt-1">Semua data isian dan baris target yang telah Anda tulis akan dihapus.</p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" onclick="closeResetModal()" class="flex-1 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">Batal</button>
+        <button type="button" onclick="executeResetForm()" class="flex-1 py-2 text-xs font-semibold bg-red-600 hover:bg-red-500 text-white rounded-xl transition">Ya, Kosongkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-3 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl">
+    <div id="toastIcon" class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div>
+      <p id="toastMessage" class="text-xs font-medium">Notifikasi berhasil!</p>
+    </div>
+  </div>
+
+  <script>
+    /* ========================================================================= */
+    /* KONFIGURASI RESMI PEJABAT PENGESAH & LOGO KAMPUS                         */
+    /* ========================================================================= */
+    const PEJABAT_PENGESAH = {
+      nama: "Dr. Ahmad Syafi'i, M.Pd.",
+      nidn: "0712048204",
+      jabatan: "Wakil Ketua I Bidang Akademik"
+    };
+
+    const CAMPUS_LOGO_SRC = 'Logo stkiph png.png';
+    const defaultPlaceholderPhoto = "https://placehold.co/400x520/e2e8f0/475569?text=Pas+Foto+Resmi";
+
+    /* ========================================================================= */
+    /* NAVIGASI TAB UTAMA (DASBOR <-> FORMULIR TARGET IKU)                      */
+    /* ========================================================================= */
+    function switchMainTab(tab) {
+      const viewDash = document.getElementById('viewDashboard');
+      const viewIku = document.getElementById('viewTargetIku');
+      const btnDash = document.getElementById('navBtnDashboard');
+      const btnIku = document.getElementById('navBtnTargetIku');
+
+      if (tab === 'targetIku') {
+        viewDash.classList.add('hidden');
+        viewIku.classList.remove('hidden');
+
+        btnIku.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 bg-emerald-600 text-white shadow-xs";
+        btnDash.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-slate-600 hover:text-indigo-700 hover:bg-white/60";
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        logAccess("Form Target IKU Interaktif");
+      } else {
+        viewIku.classList.add('hidden');
+        viewDash.classList.remove('hidden');
+
+        btnDash.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 bg-white text-indigo-700 shadow-xs";
+        btnIku.className = "px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-slate-600 hover:text-indigo-700 hover:bg-white/60";
+      }
+    }
+
+    /* ========================================================================= */
+    /* JAM & TANGGAL REALTIME                                                   */
+    /* ========================================================================= */
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      const dateString = now.toLocaleDateString('id-ID', options);
+      
+      const clockElement = document.getElementById('liveClock');
+      const dateElement = document.getElementById('liveDate');
+      const curDateDisplay = document.getElementById('currentDateDisplay');
+      
+      if (clockElement) clockElement.textContent = `${hours}:${minutes}:${seconds} WIB`;
+      if (dateElement) dateElement.textContent = dateString;
+      if (curDateDisplay) curDateDisplay.textContent = now.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      // Ucapan dinamis
+      const greetingHeading = document.getElementById('greetingHeading');
+      if (greetingHeading) {
+        let greeting = 'Selamat Datang';
+        const hourNum = now.getHours();
+        if (hourNum >= 4 && hourNum < 11) greeting = 'Selamat Pagi';
+        else if (hourNum >= 11 && hourNum < 15) greeting = 'Selamat Siang';
+        else if (hourNum >= 15 && hourNum < 18) greeting = 'Selamat Sore';
+        else greeting = 'Selamat Malam';
+        greetingHeading.textContent = `${greeting}, Bapak/Ibu Dosen`;
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ========================================================================= */
+    /* FILTER PENCARIAN FORM                                                    */
+    /* ========================================================================= */
+    function filterCards() {
+      const query = document.getElementById('formSearch').value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.form-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const title = (card.getAttribute('data-title') || '').toLowerCase();
+        const category = (card.getAttribute('data-category') || '').toLowerCase();
+        if (title.includes(query) || category.includes(query)) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      const noResults = document.getElementById('noResults');
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
+    }
+
+    /* ========================================================================= */
+    /* COUNTER STATISTIK RESEPONDEN                                             */
+    /* ========================================================================= */
+    const DEFAULT_COUNTERS = {
+      bap: 48,
+      youtube: 26,
+      ta: 37,
+      pa: 52,
+      iku: 41,
+      target_iku: 35
+    };
+
+    let activeModalFormKey = null;
+    let activeModalFormTitle = '';
+
+    function getCounterData() {
+      try {
+        const saved = localStorage.getItem('dosenku_counters');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return { ...DEFAULT_COUNTERS };
+    }
+
+    function saveCounterData(data) {
+      try {
+        localStorage.setItem('dosenku_counters', JSON.stringify(data));
+      } catch (e) {}
+    }
+
+    function renderCounters() {
+      const counters = getCounterData();
+      let total = 0;
+
+      for (const [key, value] of Object.entries(counters)) {
+        const el = document.getElementById(`counter-${key}`);
+        if (el) {
+          el.textContent = `${value} Dosen`;
+        }
+        total += Number(value) || 0;
+      }
+
+      const totalEl = document.getElementById('totalFillsCounter');
+      if (totalEl) {
+        totalEl.textContent = `${total} Respon`;
+      }
+    }
+
+    function incrementCounter(key, titleName) {
+      const counters = getCounterData();
+      counters[key] = (Number(counters[key]) || 0) + 1;
+      saveCounterData(counters);
+      renderCounters();
+      showToast(`Terima kasih! Counter ${titleName} diperbarui (+1)`);
+    }
+
+    function markCurrentModalDone() {
+      if (activeModalFormKey) {
+        incrementCounter(activeModalFormKey, activeModalFormTitle);
+      }
+    }
+
+    /* ========================================================================= */
+    /* MODAL SEMAT GOOGLE FORM                                                  */
+    /* ========================================================================= */
+    function openFormModal(title, embedUrl, externalUrl, formKey) {
+      const modal = document.getElementById('formModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalExternalLink = document.getElementById('modalExternalLink');
+      const iframe = document.getElementById('formIframe');
+      const loader = document.getElementById('iframeLoader');
+
+      activeModalFormKey = formKey || null;
+      activeModalFormTitle = title || '';
+
+      modalTitle.textContent = title;
+      modalExternalLink.href = externalUrl;
+      loader.classList.remove('hidden');
+      iframe.src = embedUrl;
+
+      modal.classList.remove('hidden');
+      logAccess(title);
+    }
+
+    function closeFormModal() {
+      const modal = document.getElementById('formModal');
+      const iframe = document.getElementById('formIframe');
+      modal.classList.add('hidden');
+      iframe.src = '';
+      activeModalFormKey = null;
+      activeModalFormTitle = '';
+    }
+
+    function hideIframeLoader() {
+      const loader = document.getElementById('iframeLoader');
+      if (loader) loader.classList.add('hidden');
+    }
+
+    /* ========================================================================= */
+    /* LOG AKSES & CLIPBOARD                                                    */
+    /* ========================================================================= */
+    function logAccess(formName) {
+      try {
+        localStorage.setItem('dosenku_last_form', formName);
+        localStorage.setItem('dosenku_last_time', new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }));
+        refreshLastOpened();
+      } catch (e) {}
+    }
+
+    function refreshLastOpened() {
+      const lastOpenedText = document.getElementById('lastOpenedText');
+      try {
+        const form = localStorage.getItem('dosenku_last_form');
+        const time = localStorage.getItem('dosenku_last_time');
+        if (form && time && lastOpenedText) {
+          lastOpenedText.textContent = `${form} (${time})`;
+        }
+      } catch (e) {}
+    }
+
+    function copyToClipboard(text, label) {
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast(`${label} berhasil disalin!`);
+      } catch (err) {
+        showToast('Gagal menyalin tautan');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    /* ========================================================================= */
+    /* LOGIKA FORMULIR TARGET IKU INTERAKTIF                                     */
+    /* ========================================================================= */
+    function attachInputSync() {
+      const namaInput = document.getElementById('namaGelar');
+      const nidnInput = document.getElementById('nidn');
+
+      if (namaInput) {
+        namaInput.addEventListener('input', (e) => {
+          const val = e.target.value.trim();
+          document.getElementById('signatureName').textContent = val ? val : 'Nama Lengkap Dosen';
+        });
+      }
+
+      if (nidnInput) {
+        nidnInput.addEventListener('input', (e) => {
+          const val = e.target.value.trim();
+          document.getElementById('signatureNidn').textContent = val ? `NIDN / NUPTK: ${val}` : 'NIDN / NUPTK: -';
+        });
+      }
+    }
+
+    function addTugasTambahanRow(value = '') {
+      const container = document.getElementById('tugasTambahanContainer');
+      if (!container) return;
+
+      const rowId = 'tugas_row_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 group transition-all';
+      row.id = rowId;
+
+      row.innerHTML = `
+        <div class="relative flex-1">
+          <input type="text" name="tugasTambahanItem" value="${escapeHtml(value)}" 
+            placeholder="Contoh: Kaprodi PGSD / Pembina Asrama Mahasiswa / Panitia PMB / Staf BAAK"
+            class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
+        </div>
+        <button type="button" onclick="removeTugasTambahanRow('${rowId}')" title="Hapus baris penugasan ini"
+          class="no-print p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition border border-transparent hover:border-red-200">
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
+      `;
+
+      container.appendChild(row);
+    }
+
+    function removeTugasTambahanRow(rowId) {
+      const container = document.getElementById('tugasTambahanContainer');
+      const row = document.getElementById(rowId);
+      if (row && container) {
+        if (container.children.length === 1) {
+          const input = row.querySelector('input');
+          if (input) input.value = '';
+        } else {
+          container.removeChild(row);
+        }
+      }
+    }
+
+    function getTugasTambahanValues() {
+      const inputs = document.querySelectorAll('input[name="tugasTambahanItem"]');
+      const list = [];
+      inputs.forEach(input => {
+        const val = input.value.trim();
+        if (val) list.push(val);
+      });
+      return list;
+    }
+
+    function setTugasTambahanValues(items = []) {
+      const container = document.getElementById('tugasTambahanContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!items || items.length === 0) {
+        addTugasTambahanRow('');
+      } else {
+        items.forEach(item => addTugasTambahanRow(item));
+      }
+    }
+
+    const targetPlaceholders = {
+      pmb: {
+        desc: "Contoh: Merekrut 5 calon mahasiswa baru kelas reguler dari SMA/MA mitra di Surabaya & Sidoarjo",
+        output: "Target: 5 Calon Mahasiswa"
+      },
+      pengajaran: {
+        desc: "Contoh: Mengampu MK Metodologi Penelitian Pendidikan (3 SKS) berbasis OBE Case Method",
+        output: "Target: 3 SKS / 1 Kelas"
+      },
+      penelitian: {
+        desc: "Contoh: Penelitian Hibah Internal STKIP / Kemendikbudristek, Publikasi SINTA 2, Buku Ajar ISBN, atau Hak Cipta (HKI)",
+        output: "Target: 1 Judul / 1 Jurnal SINTA / 1 HKI"
+      },
+      pkm: {
+        desc: "Contoh: Pelatihan model Deep Learning berbasis akhlak untuk 35 guru SD mitra di Jambangan, Surabaya",
+        output: "Target: 1 Kegiatan & 1 Jurnal SINTA"
+      },
+      tugasTambahanTarget: {
+        desc: "Contoh: Menyelesaikan dokumen LKPS & LED Akreditasi Program Studi ke LAMDIK",
+        output: "Target: Dokumen Final LAMDIK"
+      }
+    };
+
+    function addTargetRow(section, descVal = '', outputVal = '') {
+      const container = document.getElementById(section + 'Container');
+      if (!container) return;
+
+      const ph = targetPlaceholders[section] || { desc: "Sebutkan target yang ingin dicapai...", output: "Target Capaian" };
+      const rowId = section + '_row_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      const row = document.createElement('div');
+      row.className = 'target-item-row flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 sm:p-2 bg-slate-50/80 rounded-xl border border-slate-200 hover:border-slate-300 transition';
+      row.id = rowId;
+
+      row.innerHTML = `
+        <div class="flex items-center gap-2 sm:w-auto">
+          <span class="row-badge w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">1</span>
+        </div>
+        <div class="flex-1">
+          <input type="text" name="${section}_desc" value="${escapeHtml(descVal)}" 
+            placeholder="${ph.desc}"
+            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+        </div>
+        <div class="sm:w-64">
+          <input type="text" name="${section}_output" value="${escapeHtml(outputVal)}" 
+            placeholder="${ph.output}"
+            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+        </div>
+        <button type="button" onclick="removeTargetRow('${rowId}', '${section}')" title="Hapus target ini"
+          class="no-print self-end sm:self-center p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition border border-transparent hover:border-red-200 shrink-0">
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
+      `;
+
+      container.appendChild(row);
+      renumberRows(section);
+    }
+
+    function removeTargetRow(rowId, section) {
+      const container = document.getElementById(section + 'Container');
+      const row = document.getElementById(rowId);
+      if (row && container) {
+        if (container.children.length === 1) {
+          const inputs = row.querySelectorAll('input');
+          inputs.forEach(i => i.value = '');
+        } else {
+          container.removeChild(row);
+        }
+        renumberRows(section);
+      }
+    }
+
+    function renumberRows(section) {
+      const container = document.getElementById(section + 'Container');
+      if (!container) return;
+      const rows = container.querySelectorAll('.target-item-row');
+      rows.forEach((row, idx) => {
+        const badge = row.querySelector('.row-badge');
+        if (badge) badge.textContent = idx + 1;
+      });
+    }
+
+    function getSectionTargetData(section) {
+      const container = document.getElementById(section + 'Container');
+      if (!container) return [];
+      const rows = container.querySelectorAll('.target-item-row');
+      const result = [];
+      rows.forEach(row => {
+        const descInput = row.querySelector(`input[name="${section}_desc"]`);
+        const outputInput = row.querySelector(`input[name="${section}_output"]`);
+        const desc = descInput ? descInput.value.trim() : '';
+        const output = outputInput ? outputInput.value.trim() : '';
+        if (desc || output) {
+          result.push({ desc, output });
+        }
+      });
+      return result;
+    }
+
+    function setSectionTargetData(section, items = []) {
+      const container = document.getElementById(section + 'Container');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!items || items.length === 0) {
+        addTargetRow(section);
+      } else {
+        items.forEach(item => addTargetRow(section, item.desc || '', item.output || ''));
+      }
+      renumberRows(section);
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (!file.type.startsWith('image/')) {
+          showToast('Harap pilih file gambar JPG/PNG!', 'error');
+          return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+          showToast('Ukuran gambar maksimal 3MB', 'error');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('photoPreview').src = e.target.result;
+          showToast('Pas foto resmi berhasil dimuat');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function resetPhoto() {
+      document.getElementById('photoPreview').src = defaultPlaceholderPhoto;
+      document.getElementById('photoInput').value = '';
+      showToast('Foto dikembalikan ke default');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/"/g, '&quot;');
+    }
+
+    /* ========================================================================= */
+    /* DOKUMEN CETAK RESMI DENGAN PENGESAHAN DR. AHMAD SYAFI'I, M.PD.           */
+    /* ========================================================================= */
+    function generatePrintableDocumentHTML() {
+      const nama = document.getElementById('namaGelar').value.trim() || '...................................................';
+      const nidn = document.getElementById('nidn').value.trim() || '-';
+      const prodi = document.getElementById('programStudi').value || '-';
+      const semester = document.getElementById('semester').value || 'Tahun Akademik Berjalan';
+      const photoSrc = document.getElementById('photoPreview').src || defaultPlaceholderPhoto;
+      
+      const tugasTambahan = getTugasTambahanValues();
+      const pmbTargets = getSectionTargetData('pmb');
+      const pengajaranTargets = getSectionTargetData('pengajaran');
+      const penelitianTargets = getSectionTargetData('penelitian');
+      const pkmTargets = getSectionTargetData('pkm');
+      const tugasTargets = getSectionTargetData('tugasTambahanTarget');
+
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const renderTargetRows = (items) => {
+        if (!items || items.length === 0) {
+          return `<tr><td colspan="3" class="text-center text-slate-400 py-2 italic">Belum ada target yang dicantumkan.</td></tr>`;
+        }
+        return items.map((item, idx) => `
+          <tr>
+            <td class="text-center font-semibold w-10 py-1.5 px-2 text-slate-700">${idx + 1}</td>
+            <td class="py-1.5 px-3 text-slate-800 leading-relaxed">${escapeHtml(item.desc || '-')}</td>
+            <td class="py-1.5 px-3 font-semibold text-slate-900 w-52">${escapeHtml(item.output || '-')}</td>
+          </tr>
+        `).join('');
+      };
+
+      const renderTugasTambahan = (list) => {
+        if (!list || list.length === 0) return '<span>-</span>';
+        return list.map(item => `<div class="flex items-start gap-1.5"><span class="text-slate-400">•</span> <span>${escapeHtml(item)}</span></div>`).join('');
+      };
+
+      return `
+        <div class="official-print-wrapper bg-white text-slate-900 leading-normal" style="font-family: 'Inter', Arial, sans-serif;">
+          <!-- Kop Surat Resmi -->
+          <div class="border-b-4 border-double border-slate-900 pb-3 mb-4">
+            <div class="flex items-center justify-between gap-3 sm:gap-4">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0 overflow-hidden">
+                <img src="${CAMPUS_LOGO_SRC}" alt="Logo STKIP Al Hikmah" class="max-w-full max-h-full object-contain" onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='logo.png';}">
+              </div>
+              <div class="text-center flex-1 min-w-0">
+                <h2 class="text-xs sm:text-sm md:text-[15px] font-black tracking-tight sm:tracking-normal text-slate-900 uppercase leading-snug whitespace-nowrap" style="white-space: nowrap;">SEKOLAH TINGGI KEGURUAN DAN ILMU PENDIDIKAN</h2>
+                <h1 class="text-base sm:text-lg md:text-xl font-black tracking-wider text-emerald-900 uppercase leading-snug whitespace-nowrap" style="white-space: nowrap;">AL HIKMAH SURABAYA</h1>
+                <p class="text-[10px] text-emerald-900 font-bold italic tracking-wide">Mencetak Pendidik Religius dan Profesional</p>
+                <p class="text-[10px] text-slate-600 mt-0.5">Jl. Kebonsari Elveka V, Kebonsari, Kec. Jambangan, Kota Surabaya, Jawa Timur 60233 | Telp: (031) 8288222</p>
+                <p class="text-[10px] text-slate-500">Website: www.hikmahuniversity.ac.id | Email: stkiph@hikmahuniversity.ac.id</p>
+              </div>
+              <div class="w-16 sm:w-20 shrink-0 text-right">
+                <span class="text-[9px] font-mono border border-slate-400 px-1 py-0.5 rounded text-slate-600 uppercase">FORM-IKU</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Judul Laporan -->
+          <div class="text-center my-3">
+            <h3 class="text-sm sm:text-base font-black uppercase text-slate-900 tracking-wide underline underline-offset-4">
+              LEMBAR PENETAPAN TARGET INDIKATOR KINERJA UTAMA (IKU)
+            </h3>
+            <p class="text-[11px] font-semibold text-slate-700 mt-1 uppercase tracking-wider">
+              DOSEN & TENAGA KEPENDIDIKAN &mdash; ${escapeHtml(semester)}
+            </p>
+          </div>
+
+          <!-- Identitas Dosen / Tendik & Foto Berdampingan -->
+          <div class="my-4 border border-slate-400 rounded-lg p-3 bg-slate-50/50">
+            <div class="flex flex-row items-start gap-4">
+              <div class="w-28 h-36 border border-slate-400 rounded bg-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                <img src="${photoSrc}" alt="Foto Resmi" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 text-xs">
+                <table class="w-full border-none" style="border: none !important;">
+                  <tbody style="border: none !important;">
+                    <tr style="border: none !important;"><td style="border: none !important; width: 140px;" class="font-bold py-1 text-slate-700">Nama Lengkap & Gelar</td><td style="border: none !important;" class="py-1 font-bold text-slate-900">: ${escapeHtml(nama)}</td></tr>
+                    <tr style="border: none !important;"><td style="border: none !important;" class="font-bold py-1 text-slate-700">NIDN / NUPTK / NIP</td><td style="border: none !important;" class="py-1">: ${escapeHtml(nidn)}</td></tr>
+                    <tr style="border: none !important;"><td style="border: none !important;" class="font-bold py-1 text-slate-700">Program Studi / Status</td><td style="border: none !important;" class="py-1 font-semibold text-emerald-800">: ${escapeHtml(prodi)}</td></tr>
+                    <tr style="border: none !important;"><td style="border: none !important;" class="font-bold py-1 text-slate-700">Semester / TA</td><td style="border: none !important;" class="py-1">: ${escapeHtml(semester)}</td></tr>
+                    <tr style="border: none !important;"><td style="border: none !important; vertical-align: top;" class="font-bold py-1 text-slate-700">Tugas Tambahan</td><td style="border: none !important;" class="py-1">: <div class="inline-block align-top">${renderTugasTambahan(tugasTambahan)}</div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seksi 1: PMB -->
+          <div class="mb-4">
+            <div class="bg-amber-100/70 border border-amber-300 px-2.5 py-1 text-xs font-bold text-amber-900 uppercase">
+              1. Target Kontribusi Penerimaan Mahasiswa Baru (PMB)
+            </div>
+            <table class="w-full mt-1 border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700">
+                  <th class="w-10 text-center py-1">No</th>
+                  <th class="text-left py-1 px-3">Uraian Target / Sasaran Jalur PMB</th>
+                  <th class="text-left py-1 px-3 w-52">Target Capaian</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${renderTargetRows(pmbTargets)}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Seksi 2: Pengajaran -->
+          <div class="mb-4">
+            <div class="bg-blue-100/70 border border-blue-300 px-2.5 py-1 text-xs font-bold text-blue-900 uppercase">
+              2. Target Bidang Pengajaran (Mata Kuliah, Bimbingan & Pengujian)
+            </div>
+            <table class="w-full mt-1 border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700">
+                  <th class="w-10 text-center py-1">No</th>
+                  <th class="text-left py-1 px-3">Uraian Target Pengajaran / SKS / Pembimbingan</th>
+                  <th class="text-left py-1 px-3 w-52">Target Capaian</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${renderTargetRows(pengajaranTargets)}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Seksi 3: Penelitian -->
+          <div class="mb-4">
+            <div class="bg-indigo-100/70 border border-indigo-300 px-2.5 py-1 text-xs font-bold text-indigo-900 uppercase">
+              3. Target Bidang Penelitian, Publikasi Ilmiah & HKI
+            </div>
+            <table class="w-full mt-1 border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700">
+                  <th class="w-10 text-center py-1">No</th>
+                  <th class="text-left py-1 px-3">Uraian Target Penelitian / Jurnal SINTA / Buku / HKI</th>
+                  <th class="text-left py-1 px-3 w-52">Target Capaian</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${renderTargetRows(penelitianTargets)}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Seksi 4: PkM -->
+          <div class="mb-4">
+            <div class="bg-emerald-100/70 border border-emerald-300 px-2.5 py-1 text-xs font-bold text-emerald-900 uppercase">
+              4. Target Bidang Pengabdian kepada Masyarakat (PkM)
+            </div>
+            <table class="w-full mt-1 border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700">
+                  <th class="w-10 text-center py-1">No</th>
+                  <th class="text-left py-1 px-3">Uraian Kegiatan PkM, Sasaran Sekolah/Mitra & Luaran</th>
+                  <th class="text-left py-1 px-3 w-52">Target Capaian</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${renderTargetRows(pkmTargets)}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Seksi 5: Tugas Tambahan -->
+          <div class="mb-5">
+            <div class="bg-purple-100/70 border border-purple-300 px-2.5 py-1 text-xs font-bold text-purple-900 uppercase">
+              5. Target Tugas Tambahan / Penunjang / Kepanitiaan Institusional
+            </div>
+            <table class="w-full mt-1 border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700">
+                  <th class="w-10 text-center py-1">No</th>
+                  <th class="text-left py-1 px-3">Uraian Target Kinerja Penugasan / Output Kegiatan</th>
+                  <th class="text-left py-1 px-3 w-52">Target Capaian</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${renderTargetRows(tugasTargets)}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pengesahan Resmi (Otomatis: Dr. Ahmad Syafi'i, M.Pd.) -->
+          <div class="mt-6 pt-3 border-t border-slate-400" style="page-break-inside: avoid;">
+            <p class="text-[11px] text-slate-700 mb-5 text-justify leading-relaxed">
+              Target Indikator Kinerja Utama (IKU) di atas telah disepakati dan ditetapkan bersama secara sadar dan bertanggung jawab sebagai acuan evaluasi kinerja semester berjalan di STKIP Al Hikmah Surabaya.
+            </p>
+            
+            <div class="grid grid-cols-3 gap-4 text-center text-xs">
+              <div class="flex flex-col justify-between" style="min-height: 130px;">
+                <p class="text-slate-800 leading-tight">Surabaya, ${formattedDate}<br><span class="font-semibold">Dosen / Tendik Bersangkutan,</span></p>
+                <div class="pt-12">
+                  <p class="font-bold underline text-slate-900 text-xs">${escapeHtml(nama)}</p>
+                  <p class="text-[10px] text-slate-600 mt-0.5">NIDN / NUPTK: ${escapeHtml(nidn)}</p>
+                </div>
+              </div>
+
+              <div class="flex flex-col justify-between" style="min-height: 130px;">
+                <p class="text-slate-800 leading-tight">Mengetahui,<br><span class="font-semibold">Ketua Program Studi / Atasan Langsung,</span></p>
+                <div class="pt-12">
+                  <p class="font-bold underline text-slate-900 text-xs tracking-wider">...................................................</p>
+                  <p class="text-[10px] text-slate-600 mt-0.5">NIDN / NUPTK: .................................</p>
+                </div>
+              </div>
+
+              <!-- Pejabat yang Mengesahkan Otomatis -->
+              <div class="flex flex-col justify-between" style="min-height: 130px;">
+                <p class="text-slate-800 leading-tight">Mengesahkan / Menyetujui,<br><span class="font-semibold text-emerald-950">${escapeHtml(PEJABAT_PENGESAH.jabatan)},</span></p>
+                <div class="pt-12">
+                  <p class="font-bold underline text-slate-900 text-xs">${escapeHtml(PEJABAT_PENGESAH.nama)}</p>
+                  <p class="text-[10px] font-medium text-slate-700 mt-0.5">NIDN: ${escapeHtml(PEJABAT_PENGESAH.nidn)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function openPrintPreview() {
+      const htmlContent = generatePrintableDocumentHTML();
+      const printContainer = document.getElementById('printableDocumentArea');
+      if (printContainer) printContainer.innerHTML = htmlContent;
+
+      const previewContainer = document.getElementById('previewSheetContent');
+      if (previewContainer) previewContainer.innerHTML = htmlContent;
+
+      const modal = document.getElementById('printPreviewModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closePrintPreview() {
+      const modal = document.getElementById('printPreviewModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function printDirectly() {
+      const htmlContent = generatePrintableDocumentHTML();
+      const printContainer = document.getElementById('printableDocumentArea');
+      if (printContainer) printContainer.innerHTML = htmlContent;
+
+      try {
+        window.print();
+      } catch (err) {
+        printInNewWindow();
+      }
+    }
+
+    function printInNewWindow() {
+      const htmlContent = generatePrintableDocumentHTML();
+      const printWindow = window.open('', '_blank', 'width=900,height=800');
+
+      if (!printWindow) {
+        showToast('Izinkan jendela pop-up untuk mencetak!', 'error');
+        window.print();
+        return;
+      }
+
+      printWindow.document.open();
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>Cetak Target IKU - STKIP Al Hikmah Surabaya</title>
+          <script src="https://cdn.tailwindcss.com"><\/script>
+          <style>
+            @media print {
+              body { margin: 0; padding: 0; background: #fff !important; font-size: 9pt; }
+              table { width: 100% !important; border-collapse: collapse !important; }
+              th, td { border: 1px solid #334155 !important; padding: 5px 8px !important; }
+              .no-print { display: none !important; }
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            body { font-family: 'Inter', Arial, sans-serif; background: #f8fafc; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #cbd5e1; }
+          </style>
+        </head>
+        <body>
+          <div class="no-print max-w-4xl mx-auto mb-4 flex items-center justify-between bg-white p-3 rounded-lg border border-slate-300 shadow-sm">
+            <span class="text-xs font-semibold text-slate-700">Dokumen Siap Dicetak &mdash; STKIP Al Hikmah Surabaya</span>
+            <button onclick="window.print()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-900 text-xs font-bold rounded-md shadow">
+              Cetak Sekarang / Simpan PDF
+            </button>
+          </div>
+          <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 border border-slate-300 rounded-xl shadow-sm">
+            ${htmlContent}
+          </div>
+          <script>
+            window.onload = function() {
+              setTimeout(function() { window.print(); }, 600);
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      showToast('Tab cetak berhasil dibuka!');
+    }
+
+    /* ========================================================================= */
+    /* SIMPAN DRAFT & CONTOH DATA                                               */
+    /* ========================================================================= */
+    function fillDemoData() {
+      document.getElementById('namaGelar').value = "Dr. H. Ahmad Faiz, M.Pd.";
+      document.getElementById('nidn').value = "0712048502";
+      document.getElementById('programStudi').value = "PGSD";
+      document.getElementById('semester').value = "Semester Ganjil 2026/2027";
+      
+      setTugasTambahanValues([
+        "Ketua Program Studi PGSD",
+        "Koordinator Penjaminan Mutu & Kurikulum OBE",
+        "Panitia PMB Jalur Beasiswa Pemkot Surabaya & RPL"
+      ]);
+
+      setSectionTargetData('pmb', [
+        { desc: "Sosialisasi dan penjaringan mahasiswa baru kelas reguler dari SMA/MA mitra di Surabaya & Sidoarjo", output: "Target: 5 Calon Mahasiswa" },
+        { desc: "Sosialisasi program RPL dan Kelas Profesional ke yayasan dan sekolah Al Hikmah Network", output: "Target: 4 Calon Mahasiswa" },
+        { desc: "Mengawal seleksi berkas calon mahasiswa jalur Beasiswa Pemkot Surabaya & KIP-K", output: "Target: 4 Calon Mahasiswa" }
+      ]);
+
+      setSectionTargetData('pengajaran', [
+        { desc: "Mengampu mata kuliah Metodologi Penelitian Pendidikan (3 SKS) berbasis OBE Case Method", output: "Target: 1 Kelas (3 SKS)" },
+        { desc: "Mengampu mata kuliah Desain Pembelajaran Inovatif PGSD (3 SKS) dengan Team-Based Project", output: "Target: 2 Kelas (6 SKS)" },
+        { desc: "Membimbing mahasiswa skripsi hingga tuntas sidang munaqosyah semester ini", output: "Target: 6 Mahasiswa" },
+        { desc: "Menguji sidang proposal dan sidang skripsi sarjana pendidikan", output: "Target: 8 Mahasiswa" }
+      ]);
+
+      setSectionTargetData('penelitian', [
+        { desc: "Penelitian kolaboratif dosen-mahasiswa bertema integrasi adab dan asesmen autentik kurikulum merdeka", output: "Target: 1 Hibah Penelitian Internal" },
+        { desc: "Publikasi artikel ilmiah pada Jurnal Nasional Terakreditasi SINTA 2 atau SINTA 3", output: "Target: 1 Artikel Terbit" },
+        { desc: "Pendaftaran Hak Cipta (HKI) modul ajar pendidikan karakter berbasis nilai Islam ke DJKI", output: "Target: 1 Sertifikat HKI" },
+        { desc: "Penyusunan dan penerbitan buku ajar referensi perguruan tinggi ber-ISBN", output: "Target: 1 Buku ISBN" }
+      ]);
+
+      setSectionTargetData('pkm', [
+        { desc: "Pelatihan implementasi model pembelajaran Deep Learning berbasis nilai akhlak bagi guru SD mitra di Jambangan", output: "Target: 35 Guru SD Mitra" },
+        { desc: "Publikasi artikel hasil pengabdian masyarakat pada jurnal nasional terindeks SINTA", output: "Target: 1 Artikel Terbit SINTA" }
+      ]);
+
+      setSectionTargetData('tugasTambahanTarget', [
+        { desc: "Menyelesaikan penyusunan dokumen LKPS & LED Akreditasi Program Studi ke LAMDIK", output: "Target: Dokumen Siap Submit" },
+        { desc: "Koordinasi pelaksanaan audit mutu internal (AMI) prodi dan evaluasi perkuliahan tengah semester", output: "Target: 100% Terlaksana" },
+        { desc: "Kepanitiaan resmi institusional pada pelaksanaan Wisuda Sarjana STKIP Al Hikmah", output: "Target: Selesai Tepat Waktu" }
+      ]);
+
+      document.getElementById('komitmenCheck').checked = true;
+      document.getElementById('signatureName').textContent = "Dr. H. Ahmad Faiz, M.Pd.";
+      document.getElementById('signatureNidn').textContent = "NIDN / NUPTK: 0712048502";
+      document.getElementById('photoPreview').src = "https://placehold.co/400x520/14532d/ffffff?text=Dr.+Faiz,+M.Pd.";
+
+      showToast('Data contoh Target IKU berhasil diisi!');
+    }
+
+    function saveDraft() {
+      const formData = {
+        namaGelar: document.getElementById('namaGelar').value,
+        nidn: document.getElementById('nidn').value,
+        programStudi: document.getElementById('programStudi').value,
+        semester: document.getElementById('semester').value,
+        tugasTambahanList: getTugasTambahanValues(),
+
+        pmbTargets: getSectionTargetData('pmb'),
+        pengajaranTargets: getSectionTargetData('pengajaran'),
+        penelitianTargets: getSectionTargetData('penelitian'),
+        pkmTargets: getSectionTargetData('pkm'),
+        tugasTambahanTargets: getSectionTargetData('tugasTambahanTarget'),
+
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem('dosenku_iku_draft', JSON.stringify(formData));
+        showToast('Draft Target IKU berhasil disimpan!');
+      } catch (err) {
+        showToast('Gagal menyimpan draft.', 'error');
+      }
+    }
+
+    function loadDraftIfExists() {
+      try {
+        const saved = localStorage.getItem('dosenku_iku_draft') || localStorage.getItem('stkip_iku_draft_v3');
+        if (saved) {
+          const data = JSON.parse(saved);
+          if (data.namaGelar) document.getElementById('namaGelar').value = data.namaGelar;
+          if (data.nidn) document.getElementById('nidn').value = data.nidn;
+          if (data.programStudi) document.getElementById('programStudi').value = data.programStudi;
+          if (data.semester) document.getElementById('semester').value = data.semester;
+
+          setTugasTambahanValues(data.tugasTambahanList || []);
+          setSectionTargetData('pmb', data.pmbTargets || []);
+          setSectionTargetData('pengajaran', data.pengajaranTargets || []);
+          setSectionTargetData('penelitian', data.penelitianTargets || []);
+          setSectionTargetData('pkm', data.pkmTargets || []);
+          setSectionTargetData('tugasTambahanTarget', data.tugasTambahanTargets || []);
+
+          if (data.namaGelar) {
+            document.getElementById('signatureName').textContent = data.namaGelar;
+          }
+          if (data.nidn) {
+            document.getElementById('signatureNidn').textContent = `NIDN / NUPTK: ${data.nidn}`;
+          }
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function showResetModal() {
+      const modal = document.getElementById('resetModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+      const modal = document.getElementById('resetModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function executeResetForm() {
+      closeResetModal();
+      document.getElementById('ikuForm').reset();
+      resetPhoto();
+      setTugasTambahanValues(['']);
+      ['pmb', 'pengajaran', 'penelitian', 'pkm', 'tugasTambahanTarget'].forEach(sec => setSectionTargetData(sec, []));
+
+      document.getElementById('signatureName').textContent = 'Nama Lengkap Dosen';
+      document.getElementById('signatureNidn').textContent = 'NIDN / NUPTK: -';
+
+      try {
+        localStorage.removeItem('dosenku_iku_draft');
+      } catch(e) {}
+      showToast('Formulir berhasil dikosongkan');
+    }
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      saveDraft();
+      incrementCounter('target_iku', 'Target IKU Dosen & Tendik');
+      openPrintPreview();
+    }
+
+    /* ========================================================================= */
+    /* TOAST NOTIFICATION                                                       */
+    /* ========================================================================= */
+    let toastTimeout;
+    function showToast(msg, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      
+      toastMessage.textContent = msg;
+
+      if (type === 'error') {
+        toastIcon.className = 'w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs';
+        toastIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+      } else {
+        toastIcon.className = 'w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs';
+        toastIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+
+    /* ========================================================================= */
+    /* WINDOW INITIALIZATION                                                    */
+    /* ========================================================================= */
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshLastOpened();
+      renderCounters();
+      attachInputSync();
+
+      // Cek inisialisasi baris tugas tambahan awal
+      const tugasContainer = document.getElementById('tugasTambahanContainer');
+      if (tugasContainer && tugasContainer.children.length === 0) {
+        addTugasTambahanRow();
+      }
+
+      // Cek draft tersimpan atau baris awal kosong
+      const draftLoaded = loadDraftIfExists();
+      if (!draftLoaded) {
+        ['pmb', 'pengajaran', 'penelitian', 'pkm', 'tugasTambahanTarget'].forEach(sec => {
+          const container = document.getElementById(sec + 'Container');
+          if (container && container.children.length === 0) {
+            addTargetRow(sec);
+          }
+        });
+      }
+
+      // Iframe loader binder
+      const iframe = document.getElementById('formIframe');
+      if (iframe) {
+        iframe.addEventListener('load', hideIframeLoader);
+      }
+    });
+  </script>
+</body>
+</html>
